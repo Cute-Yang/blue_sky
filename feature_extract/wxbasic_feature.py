@@ -213,4 +213,58 @@ def parse_wxinfo(msg,spread_msg,task_crate_time):
     gamble_in_wxp += len(
         re.findall(r"菠菜|厅主|猪蹄|埋雷|上分|下分|房费|特码|僵尸粉检测", signature))
 
-    gamble_pattern_in_wxp += gamble_pattern_detect(nickname)
+    gamble_pattern_in_wxp += util.gamble_pattern_detect(nickname)
+
+
+def parse_line(main_account_data,spread_account_data):
+    add_time=main_account_data["add_time"]
+    task_create_time=datetime.datetime.strptime(add_time,TIME_FORMAT)
+    output=[
+        main_account_data["main_account_id"],main_account_data["account"]
+    ]
+    #微信社交信息
+    sns_output=parse_sns(
+        key="group_msg",
+        msg=main_account_data,
+        task_create_time=task_create_time
+    )
+    
+    #微信登录设备
+    device_output=parse_device(
+        key="logindev_msg",
+        msg=main_account_data,
+        task_create_time=task_create_time
+    )
+
+    #微信支付信息
+    pay_info_output=parse_pay_info(
+        key="wxpay_register_time",
+        msg=main_account_data,
+        task_create_time=task_create_time
+    )
+
+    output.extend(sns_output)
+    output.extend(device_output)
+    output.extend(pay_info_output)
+    return output
+
+if __name__ == "__main__":
+    # data_file = "/home/sun/桌面/account_model/data/2021-05-08#2021-05-08.txt"
+    data_file="C:/Users/sunyyao/Desktop/NanGuo/xgb_model/data/2021-05-12#2021-05-12.txt"
+    data_wraper = data_interface.DataWraper(
+        src=data_file
+    )
+    data_gen = data_wraper.wrap_batch_data()
+    # skip None
+    next(data_gen)
+    for main_account_data,spread_account_data in data_gen:
+        deal_msg=main_account_data["deal_msg"]
+        add_time = main_account_data["add_time"]
+        util.logging.info(add_time)
+        task_create_time = datetime.datetime.strptime(add_time, TIME_FORMAT)
+        output=parse_line(
+            main_account_data=main_account_data,
+            spread_account_data=spread_account_data,
+            task_create_time=task_create_time,
+        )
+        print(output)
