@@ -1,0 +1,5 @@
+{
+    "python.pythonPath": "c:\\Users\\sunyyao\\Desktop\\mul_nn\\mutitasklearning_model\\tf\\Scripts\\python.exe",
+    "python.analysis.extraPaths": ["feature_extract"],
+    "editor.semanticHighlighting.enabled": false
+}
