@@ -1,3 +1,4 @@
+from math import log
 import traceback
 import os
 import logging
@@ -126,6 +127,11 @@ class DataWraper(object):
             related_type_id = self.search_map["type"]
             related_type = line_split[related_type_id]
 
+            logindev_msg_id=self.search_map["logindev_msg"]
+            logindev_msg=line_split[logindev_msg_id]
+            
+            idcard_id=self.search_map["idcard"]
+            idcard=line_split[idcard_id]
             # return a data map
             data = {
                 "account": account,
@@ -146,7 +152,9 @@ class DataWraper(object):
                 "quality": quality,
                 "sex": sex,
                 "phone": phone,
-                "related_type": related_type
+                "related_type": related_type,
+                "logindev_msg":logindev_msg,
+                "idcard":idcard
             }
         except KeyError:
             logging.error("error occured when get data", exc_info=True)

@@ -1,10 +1,14 @@
 import util
 import data_interface
+import configparser
 
-def parse_bg_judge(msg:str):
+import traceback
+
+def parse_bg_judge(key,msg):
     '''
     Args:
     ------
+    key:content key
     msg:str
     '''
     # 恶意封号等级
@@ -22,7 +26,13 @@ def parse_bg_judge(msg:str):
     opponent_distribution = -1
     # 高危场景交易
     expresult = -1
-    add_msg_json=util.load_json(msg)
+    if key not in msg or (not msg):
+        return [
+            blockevilevel, deviceblockrate, deviceexposerate, cardblockrate,
+            cardexposerate, risklevel, textexp, opponent_distribution, expresult
+        ]
+    wxsafe_msg=msg[key]
+    add_msg_json=util.load_json(wxsafe_msg)
     wxsafe_cheat = add_msg_json.get("wxsafe_reported_cheatevidence")
     if wxsafe_cheat:
         # this way can avoid return None value
@@ -54,14 +64,30 @@ def parse_bg_judge(msg:str):
         cardexposerate, risklevel, textexp, opponent_distribution, expresult
     ]
 
-def parse_line():
-    deal_msg=main_account_data["add_msg"]
-    output=parse_bg_judge(deal_msg)
-    print(deal_msg)
+def parse_line(main_account_data):
+    try:
+        output=parse_bg_judge(
+            key="add_msg",
+            msg=main_account_data
+        )
+        return output
+    except:
+        traceback.print_exc()
+        return []
+
 
 if __name__ == "__main__":
-    # data_file = "/home/sun/桌面/account_model/data/2021-05-08#2021-05-08.txt"
-    data_file="C:/Users/sunyyao/Desktop/NanGuo/xgb_model/data/2021-05-12#2021-05-12.txt"
+    data_file = "/home/sun/桌面/account_model/data/2021-05-08#2021-05-08.txt"
+    cnf = configparser.ConfigParser()
+    cnf.read("feature_extract/feature_cfg.conf")
+    perfix_feature_names = cnf.get('prefix_feature', 'feature_names')
+    perfix_feature_names = perfix_feature_names.split(',')
+    perfix_feature_names = [x.strip() for x in perfix_feature_names]
+    print("perfix_feature_names", perfix_feature_names)
+    feature_names = cnf.get('bg_judge_feature', 'feature_names')
+    feature_names=feature_names.split(",")
+    feature_names=[x.strip() for x in feature_names]
+    # data_file="C:/Users/sunyyao/Desktop/NanGuo/xgb_model/data/2021-05-12#2021-05-12.txt"
     data_wraper = data_interface.DataWraper(
         src=data_file
     )
@@ -69,6 +95,13 @@ if __name__ == "__main__":
     # skip None
     next(data_gen)
     for main_account_data,_ in data_gen:
-        add_msg=main_account_data["add_msg"]
-        output=parse_bg_judge(add_msg)
-        print(output)
+        bg_judge_feature=parse_line(
+            main_account_data=main_account_data
+        )   
+        assert len(bg_judge_feature)==len(feature_names),"not match,feature_names is:%d but return is :%d"%(len(feature_names),len(bg_judge_feature))
+        print(
+            list(
+                zip(feature_names,bg_judge_feature)
+            )
+        )
+            

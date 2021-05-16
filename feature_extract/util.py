@@ -1,9 +1,13 @@
 import json
-from typing import Pattern
 from urllib.parse import unquote_plus
 import logging
 import re
-from math import copysign, sqrt
+import datetime
+from math import exp, sqrt
+
+from evidence_feature import TIME_FORMAT
+
+TIME_FOMRAT="%Y-%m-%d %H:%M:%S"
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -42,6 +46,7 @@ def text_deal(text:str):
     text = text.replace('\r', '')
     text = text.replace('\n', '')
     text = text.replace('\001', '')
+    text=text.replace("🐮","牛").replace("🀄️","牌").replace("niu","牛")
     return text
 
 
@@ -81,7 +86,7 @@ def string_distance(string_list):
             multi+=v1[idx]*v2[idx]
             v1_square+=v1[idx]**2
             v2_square+=v2[idx]**2
-        cos_value=multi/(sqrt(v1_square)*sqrt(v2_square))
+        cos_value=multi/(sqrt(v1_square)*sqrt(v2_square)+1e-5)
         return cos_value
 
     union_char=set()
@@ -122,14 +127,46 @@ string_distance_test()
 def gamble_pattern_detect(org):
     cnt = 0
     pattern = re.findall(
-        r"[1-9|一|二|三|四|五|六|七|八|九|十][^1-9|一|二|三|四|五|六|七|八|九|十]"
         r"[1-9|一|二|三|四|五|六|七|八|九|十][^1-9|一|二|三|四|五|六|七|八|九|十]",
         org)
-    if pattern is not None:
+    if not pattern:
         for p in pattern:
             p_re = re.findall(
                 r"[1|2|3|4|5|6|7|8|9|一|二|三|四|五|六|七|八|九|十][元|毛]", p
             )
-            if p_re is not None:
+            if p_re:
                 cnt += 1
     return cnt
+
+def greeting_text_deal(text):
+    text=text.replace("🐮","牛").replace("🀄️","牌").replace("niu","牛")
+    text=text.upper()
+    return text
+
+def greeting_text_number_rate(text)->float:
+    digit_pattern=r"\d"
+    digit_list=re.findall(digit_pattern,text)
+    digit_rate=len(digit_list)/(len(text)+1e-5)
+    return digit_rate
+
+
+def multi_unquote(msg,max_retry=3):
+    while max_retry>0:
+        try:
+            msg=unquote_plus(msg)
+            decode_msg=json.loads(msg)
+            return True,decode_msg
+        except json.decoder.JSONDecodeError:
+            max_retry-=1
+    return False,""
+
+def decode_exposetime(exposetime):
+    if isinstance(exposetime,int):
+        res=datetime.datetime.fromtimestamp(exposetime)
+        time_str=datetime.datetime.strftime(res,TIME_FORMAT)
+        return True,res,time_str
+    elif isinstance(exposetime,str):
+        res=datetime.datetime.strptime(exposetime,TIME_FORMAT)
+        return True,res,exposetime
+    else:
+        return False,""
