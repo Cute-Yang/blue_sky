@@ -10,6 +10,8 @@ from collections import defaultdict,Counter
 import time
 import datetime
 import traceback
+from rule import complaint_type_lookup,complaint_transfer
+
 TIME_FORMAT="%Y-%m-%d %H:%M:%S"
 
 from word_pattern import(
@@ -72,14 +74,18 @@ def income_outcome_text(key,msg):
     """
     incomegreeting, outcomegreeting = [], []
     income_number, outcome_number = 0, 0
+    income_cnt,outcome_cnt=0,0
     income_number_pct,outcome_number_pct=0,0
     income_face_2_face_cnt, outcome_face_2_face_cnt = 0, 0
+    income_face_2_face_pct,outcome_face_2_face_pct=0,0
     income_pattern_list, outcome_pattern_list = [], []
     #出入账文本中数值占比
     income_number_rate,outcome_number_rate=0,0
     #出入账文本异常的数量，这里匹配色情和赌博
     income_abnormal,outcome_abnormal=0,0
-
+    income_max_pattern_cnt,outcome_max_pattern_cnt=0,0
+    income_max_pattern_pct,outcome_max_pattern_pct=0,0
+    income_max_pattern,outcome_max_pattern="",""
     if key in msg and msg[key]:
         greeting_text=unquote_plus(msg[key])
         greeting_text=json.loads(greeting_text)
@@ -245,6 +251,8 @@ def evidence_feature(account_data,key,task_create_time):
     #支付宝
     alipay_account_number,alipay_cnt=0,0
     
+    #投诉方向,相同方向的投诉人数
+    complaint_direction,complaint_direction_number=-1,0
     #举证中有订单的次数
     trans_account_number=0
     #举证中有图片的次数
@@ -298,6 +306,7 @@ def evidence_feature(account_data,key,task_create_time):
     reporter_transfer_set,be_reported_transfer_set=set(),set()
     reporter_redpacket_set,be_reported_redpacket_set=set(),set()
     
+    complaint_direction_block=defaultdict(list)
     datetime_6m=task_create_time-datetime.timedelta(days=30*6)
     for data in account_data:
         complaint_msg=data["complaint_msg"]
@@ -332,6 +341,17 @@ def evidence_feature(account_data,key,task_create_time):
                 )
     
             from_complaint_account_set.add(from_wxid)
+            complaint_sub_type = int(complaint.get("complaint_sub_type"))
+            complaint_main_type = int(complaint.get("complaint_type"))
+            complaint_src = complaint.get("src")
+            complaint_type = complaint_transfer(
+                src=complaint_src,
+                complaint_sub_type=complaint_sub_type,
+                complaint_type=complaint_main_type
+            )
+            complaint_type = complaint_type_lookup[complaint_type]
+            if complaint_type:
+                complaint_direction_block[from_wxid].append(complaint_type)
             if "evidence" in complaint:
                 evidence=complaint["evidence"]
                 try:
@@ -421,7 +441,20 @@ def evidence_feature(account_data,key,task_create_time):
             for _,value in block.items():
                 from_complaint_num+=len(value)
             return to_complaint_num,from_complaint_num
-        
+        def _stat_complaint_type(block):
+            temp=[]
+            t,n=-1,0
+            for key,value in block.items():
+                if value:
+                    value_count=Counter(value)
+                    most_complaint=value_count.most_common(1)[0]
+                    temp.append(most_complaint)
+            if temp:
+                temp_count=Counter(temp)
+                t,n=temp_count.most_common(1)[0]
+            return t,n
+
+        complaint_direction,complaint_direction_number=_stat_complaint_block(complaint_direction_block)
         complaint_number=len(complaint_set)
         
         from_complaint_account_number=len(from_complaint_account_set)
@@ -490,7 +523,8 @@ def evidence_feature(account_data,key,task_create_time):
         reporter_money_cnt,reporter_money_pct,
         be_reported_money_cnt,be_reported_money_pct,
         complaint_account_number,from_complaint_account_number,complaint_number,
-        complaint_sens_pct
+        complaint_sens_pct,
+        complaint_direction,complaint_direction_number
     ]
 
 def parse_line(main_account_data,spread_account_data,task_create_time):

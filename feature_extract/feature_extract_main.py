@@ -1,12 +1,24 @@
+from collections import defaultdict
 import data_interface
 import evidence_feature
 import wxbasic_feature
 import bg_judge_feature
 import intercept_feature
 import datetime
+import argparse
 
-SOURCE_FILE=data_file="C:/Users/sunyyao/Desktop/NanGuo/xgb_model/data/2021-05-12#2021-05-12.txt"
-DST_FILE="text.txt"
+arg_parser=argparse.ArgumentParser()
+arg_parser.add_argument("--source_file",type=str,default="")
+arg_parser.add_argument("--dst_file",type=str,default="")
+
+args=arg_parser.parse_args()
+
+# SOURCE_FILE=data_file="C:/Users/sunyyao/Desktop/NanGuo/xgb_model/data/2021-05-12#2021-05-12.txt"
+# DST_FILE="text.txt"
+
+SOURCE_FILE=args.source_file
+DST_FILE=args.dst_file
+
 writer=open(DST_FILE,mode="w",encoding="utf-8")
 TIME_FORMAT="%Y-%m-%d %H:%M:%S"
 def main():

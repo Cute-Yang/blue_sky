@@ -76,7 +76,7 @@ def train(task_typ):
             "objective": objective,
             "eta": 0.01,
             "max_depth": 6,
-            "colsample_bytree": 0.6,
+            "colsample_bytree": 0.8,
             "min_child_weight": 3,
             "eval_metric": ["auc"],
             "nthread": 20,
@@ -92,7 +92,7 @@ def train(task_typ):
             num_boost_round=2000,
             evals=[(dtrain, "train_set"), (dtest, "test_set")],
             early_stopping_rounds=500,
-            obj=focal_obj
+            # obj=focal_obj
         )
 
     elif class_number>2:

@@ -4,8 +4,6 @@ import configparser
 from sklearn.model_selection import train_test_split
 import pandas as pd
 import xgboost as xgb
-import os
-import util
 import logging
 logging.basicConfig(
     level=logging.DEBUG,
@@ -175,7 +173,7 @@ class Parser(object):
         numerical_index = [i for i in all_index if
                           i not in text_index and i not in enum_index]
         sb=[feature_all[item] for item in numerical_index]
-        util.logging.info(sb)
+        logging.info(sb)
         # print("numerical_index", [feature_all[i] for i in numerical_index])
         print("numerical_index", len(numerical_index))
 
@@ -302,7 +300,7 @@ class Parser(object):
             feature_df["quality"]=feature_df["quality"].apply(label_func_v1)
 
         rows,cols=feature_df.shape
-        util.logging.info("feature shape:rows {} x cols {}".format(rows,cols))
+        logging.info("feature shape:rows {} x cols {}".format(rows,cols))
 
         selected_feature=self.feature_config["feature_selected"]
         x_all=feature_df[selected_feature]
@@ -310,11 +308,11 @@ class Parser(object):
         y_all=feature_df["quality"]
         account_name=["main_account_id","wxid"]
         if split:
-            x_train,x_test,y_train,y_test=train_test_split(x_all,y_all,test_size=0.1,random_state=6)
+            x_train,x_test,y_train,y_test=train_test_split(x_all,y_all,test_size=0.3,random_state=6)
             train_dis=y_train.value_counts()
             test_dis=y_test.value_counts()
-            util.logging.info("训练数据:%s"%dict(train_dis))
-            util.logging.info("验证数据:%s"%dict(test_dis))
+            logging.info("训练数据:%s"%dict(train_dis))
+            logging.info("验证数据:%s"%dict(test_dis))
             #转换成xgboost需要的数据格式
             dataset_train=xgb.DMatrix(x_train,label=y_train)
             dataset_test=xgb.DMatrix(x_test,label=y_test)
