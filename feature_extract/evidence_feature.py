@@ -310,7 +310,7 @@ def evidence_feature(account_data,key,task_create_time):
     datetime_6m=task_create_time-datetime.timedelta(days=30*6)
     for data in account_data:
         complaint_msg=data["complaint_msg"]
-        complaint_account_number+=1
+        # complaint_account_number+=1
         if complaint_msg=="":
             continue
         to_wxid=data["account"]
@@ -318,7 +318,7 @@ def evidence_feature(account_data,key,task_create_time):
         if not _status:
             util.logging.info("json decode failed.....")
             continue
-        # complaint_account_number+=1
+        complaint_account_number+=1
         for complaint in complaint_list:
             if "wxid" not in complaint:
                 util.logging.info("found a invalid complaint item,miss wxid....")
@@ -482,7 +482,7 @@ def evidence_feature(account_data,key,task_create_time):
         be_reported_money_pct=be_reported_money_cnt/(from_complaint_account_number+1e-5)
 
         #被举报人说话句数
-        complaint_sens_pct=len(sens_set)/(complaint_number+1e-5)
+        complaint_sens_pct=len(sens_set)/(from_complaint_number+1e-5)
 
 
         #举报中订单数量 平均订单数量
