@@ -321,7 +321,7 @@ def evidence_feature(account_data,key,task_create_time):
         # complaint_account_number+=1
         for complaint in complaint_list:
             if "wxid" not in complaint:
-                util.logging.info("found a invalid compliant item,miss wxid....")
+                util.logging.info("found a invalid complaint item,miss wxid....")
                 continue
             from_wxid=complaint["wxid"]
 

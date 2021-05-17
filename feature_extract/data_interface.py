@@ -16,7 +16,7 @@ class DataWraper(object):
         self.need_field = [
             "account", "main_account_id", "account_class", "add_time", "deal_msg", "greeting_text",
             "complaint_msg", "add_msg", "nickname", "signature", "group_msg", "opentime", "wxpay_register_time",
-            "id_bind_account_num", "age", "sex", "phone", "related_type", "quality"
+            "id_bind_account_num", "age", "sex", "phone", "type", "quality","idcard"
         ]
 
     def _key_2_id(self, header_list):
@@ -42,7 +42,7 @@ class DataWraper(object):
         _miss:string,the first miss field name
         """
         for name in need_field:
-            if name not in need_field:
+            if name not in all_field:
                 return False, name
         return True, ""
 
