@@ -1,5 +1,5 @@
 {
-    "python.pythonPath": "/usr/bin/python3.6",
-    "python.analysis.extraPaths": ["feature_extract"],
+    "python.pythonPath": "c:\\Users\\sunyyao\\Desktop\\mul_nn\\mutitasklearning_model\\tf\\Scripts\\python.exe",
+    "python.analysis.extraPaths": ["feature_extract","xgb"],
     "editor.semanticHighlighting.enabled": false
 }

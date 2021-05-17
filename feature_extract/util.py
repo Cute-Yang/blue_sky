@@ -5,9 +5,8 @@ import re
 import datetime
 from math import exp, sqrt
 
-from evidence_feature import TIME_FORMAT
 
-TIME_FOMRAT="%Y-%m-%d %H:%M:%S"
+TIME_FORMAT="%Y-%m-%d %H:%M:%S"
 
 logging.basicConfig(
     level=logging.DEBUG,

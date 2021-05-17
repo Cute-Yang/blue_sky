@@ -29,9 +29,9 @@ from word_pattern import(
 )
 
 #同设备关联
-DEVICE_SPEAD=1
+DEVICE_SPEAD=2
 #同身份关联
-BINDCARD_SPEAD=2
+BINDCARD_SPEAD=1
 
 
 def face_2_face_pay(string):
@@ -72,6 +72,7 @@ def income_outcome_text(key,msg):
     """
     incomegreeting, outcomegreeting = [], []
     income_number, outcome_number = 0, 0
+    income_number_pct,outcome_number_pct=0,0
     income_face_2_face_cnt, outcome_face_2_face_cnt = 0, 0
     income_pattern_list, outcome_pattern_list = [], []
     #出入账文本中数值占比
@@ -336,10 +337,11 @@ def evidence_feature(account_data,key,task_create_time):
                 try:
                     evidence=evidence.split("|")
                 except:
-                    util.logging.info("meet evidence data format list...")
                     if not isinstance(evidence, list):
                         util.logging.error("unknown evidence data format not str or list")
                         evidence=[]
+                    # else:
+                    #     util.logging.info("meet evidence data format list...")
                 pic_set.update(evidence)
                 pic_account_set.add(from_wxid)
 
@@ -528,8 +530,8 @@ def parse_line(main_account_data,spread_account_data,task_create_time):
         return output
 
 def test():
-    data_file = "/home/sun/桌面/account_model/data/2021-05-08#2021-05-08.txt"
-    # data_file="C:/Users/sunyyao/Desktop/NanGuo/xgb_model/data/2021-05-12#2021-05-12.txt"
+    # data_file = "/home/sun/桌面/account_model/data/2021-05-08#2021-05-08.txt"
+    data_file="C:/Users/sunyyao/Desktop/NanGuo/xgb_model/data/2021-05-12#2021-05-12.txt"
     cnf = configparser.ConfigParser()
     cnf.read("feature_extract/feature_cfg.conf")
     perfix_feature_names = cnf.get('prefix_feature', 'feature_names')

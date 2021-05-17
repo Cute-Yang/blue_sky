@@ -6,6 +6,11 @@ import pandas as pd
 import xgboost as xgb
 import os
 import util
+import logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s [%(levelname)s]: %(message)s"
+)
 
 class Parser(object):
     def __init__(self, feature_type="v1"):

@@ -1,6 +1,4 @@
 import configparser
-from enum import IntEnum
-from logging import log
 import data_interface
 import util
 from urllib.parse import unquote_plus
@@ -169,9 +167,11 @@ def parse_device(key,msg,task_create_time):
     ipad_pct = ipad_login_cnt / (device_type_login_cnt + 1e-5)
     mac_pct = mac_login_cnt / (device_type_login_cnt + 1e-5)
 
-    return [latest_devicename, android_most, iphone_most, windows_most,
-            iphone_pct, android_pct, windows_pct, ipad_pct,
-            mac_pct, change_device_cnt]
+    return [
+        latest_devicename, android_most, iphone_most, windows_most,
+        iphone_pct, android_pct, windows_pct, ipad_pct,
+        mac_pct, change_device_cnt
+    ]
 
 def parse_wxinfo(msg,task_create_time):
     """
@@ -189,12 +189,12 @@ def parse_wxinfo(msg,task_create_time):
     illegal_solicit_in_wxp = 0
     gamble_in_wxp = 0
     gamble_pattern_in_wxp = 0
-    is_demestic_phone=0
-    is_demestic_idcard=0
+    is_demestic_phone=1
+    is_demestic_idcard=1
     logout=0
     age=0
     sex=0
-
+    is_bind_phone=1
     sex_map={
         "":-1,
         "男":0,
@@ -216,6 +216,8 @@ def parse_wxinfo(msg,task_create_time):
     #绑定的手机号是否国内
     if "phone" in msg:
         phone=msg["phone"]
+        if phone!="":
+            is_bind_phone=1
         if re.match(phone_pattern,phone):
             is_demestic_phone=1
     
@@ -276,7 +278,7 @@ def parse_wxinfo(msg,task_create_time):
             opentime_to_now, sale_in_wxp, business_in_wxp,
             illegal_solicit_in_wxp, gamble_in_wxp,
             gamble_pattern_in_wxp, nickname, signature,
-            sex,age,is_demestic_phone,is_demestic_idcard,logout
+            sex,age,is_demestic_phone,is_demestic_idcard,logout,is_bind_phone
         ]
 def parse_account_nickname(main_account_data,spread_account_data):
     """
@@ -332,8 +334,8 @@ def parse_line(main_account_data,spread_account_data,task_create_time):
         )
 
         output.extend(sns_output)
-        output.extend(device_output)
         output.extend(pay_info_output)
+        output.extend(device_output)
         output.extend(wxinfo_output)
         output.extend(nickname_similarity_output)
         return output

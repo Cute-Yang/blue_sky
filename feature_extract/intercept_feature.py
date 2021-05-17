@@ -162,7 +162,7 @@ def parse_wxsafe_block_data(msg: str, task_create_time,key):
         ban_in_1m,ban_reason_abnormal
     ]
 
-def paser_line(main_account_data,task_create_time):
+def pase_line(main_account_data,task_create_time):
     try:
         output=parse_wxsafe_block_data(
             msg=main_account_data,
